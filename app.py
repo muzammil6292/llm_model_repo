@@ -1,8 +1,9 @@
 from dotenv import load_dotenv
 load_dotenv()
-
 import streamlit as st
-from utils.parallel import run_parallel, generate_report
+from utils.parallel import run_parallel
+from utils.report import generate_report
+import auth
 
 st.set_page_config(
     page_title="LLM Comparison Tool",
@@ -10,7 +11,22 @@ st.set_page_config(
     layout="wide"
 )
 
+# -------- AUTH GATE --------
+if "authenticated" not in st.session_state or not st.session_state.authenticated:
+    auth.login()
+    st.stop()
+
+# -------- LOGGED-IN UI --------
+st.write(f"Welcome {st.session_state.user}")
+
+if st.button("Logout"):
+    st.session_state.authenticated = False
+    st.session_state.user = None
+    st.rerun()
+
 st.title("🚀 LLM Comparison Tool")
+st.caption("🔒 Demo authentication only — users reset on refresh")
+
 st.markdown(
     """
 Compare **ChatGPT**, **Gemini**, and **LLaMA**
